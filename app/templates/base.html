@@ -1,37 +1,146 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayPlanner | 思い出の地図</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fcf6e9;
+            font-family: 'Kiwi Maru', serif;
+            color: #5d4037;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
 
-  <style>
-    /* アプリ全体の文字を丸みのある手書き風に固定 */
-    body, h1, h2, h3, p, label, input, textarea, button {
-    font-family: 'Kiwi Maru', serif !important;
-    color: #5d4037; /* 真っ黒ではなく、少し温かい茶色に */
-    }
-  </style>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PlayPlanner</title>
+        /* --- ふわふわ動く旅の背景要素 --- */
+        .bg-element {
+            position: fixed; /* スクロールしても位置を固定 */
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: -1; /* コンテンツの裏側に配置 */
+        }
+
+        /* 飛行機 (サボテンの代わり) */
+        .plane {
+            width: 120px;
+            height: 120px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/784/784306.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            top: 15%;
+            left: -150px;
+            animation: flyAcross 30s linear infinite;
+        }
+
+        /* 熱気球 */
+        .balloon {
+            width: 100px;
+            height: 130px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/861/861783.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            bottom: 10%;
+            right: -120px;
+            animation: flyBack 45s linear infinite;
+        }
+
+        /* 雲 (複数配置) */
+        .cloud {
+            width: 150px;
+            height: 80px;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3222/3222621.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.3;
+        }
+
+        /* アニメーション設定 */
+        @keyframes flyAcross {
+            0% { transform: translateX(0) translateY(0) rotate(5deg); }
+            50% { transform: translateX(60vw) translateY(-30px) rotate(0deg); }
+            100% { transform: translateX(120vw) translateY(0) rotate(5deg); }
+        }
+
+        @keyframes flyBack {
+            0% { transform: translateX(0) translateY(0); }
+            50% { transform: translateX(-60vw) translateY(20px); }
+            100% { transform: translateX(-120vw) translateY(0); }
+        }
+
+        /* --- ナビゲーションとおしゃれな枠組み --- */
+        nav {
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 12px 30px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 20px;
+            z-index: 1000;
+            border-radius: 50px;
+            width: fit-content;
+            margin: 0 auto 30px auto;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #7b9e7b;
+            font-weight: bold;
+            transition: 0.3s;
+            padding: 5px 10px;
+        }
+
+        nav a:hover {
+            color: #4E7055;
+            transform: scale(1.1);
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 50px;
+            box-shadow: 0 20px 50px rgba(93, 64, 55, 0.1);
+            border: 2px solid #fff;
+            position: relative;
+            z-index: 10;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #bcaaa4;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
-<body style="font-family: system-ui; padding: 0; margin: 0; background-color: #fcfcfc;">
+<body>
+    <div class="bg-element plane"></div>
+    <div class="bg-element balloon"></div>
+    <div class="bg-element cloud" style="top: 10%; right: 10%; animation: flyBack 60s linear infinite;"></div>
+    <div class="bg-element cloud" style="bottom: 20%; left: 5%; animation: flyAcross 50s linear infinite; opacity: 0.2;"></div>
 
-  <nav style="padding: 15px; background: white; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100;">
-      
-      <a href="{{ url_for('pages.index') }}" style="text-decoration: none; font-weight: bold; color: #FF5A5F; font-size: 1.2rem; display: flex; align-items: center; gap: 5px;">
-        🏠 ホーム
-      </a>
+    <nav>
+        <a href="/">🏠 ホーム</a>
+        <a href="/map">🗺 遊び場を探す</a>
+        <a href="/memories">📸 思い出マップ</a>
+    </nav>
 
-      <div>
-          <a href="{{ url_for('pages.memories_list') }}" style="text-decoration: none; color: #666; font-size: 0.9rem;">
-            思い出
-          </a>
-      </div>
-  </nav>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
 
-  <div style="padding: 20px;">
-    {% block content %}{% endblock %}
-  </div>
-
+    <footer>
+        &copy; 2026 PlayPlanner - 素敵な旅の記録 🕊️
+    </footer>
 </body>
 </html>
