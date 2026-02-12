@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>遊び場を探す</h2>
+
+{% if not shops %}
+<div style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+    <form action="/map" method="POST">
+        <label>集合する駅名をカンマ（,）区切りで入力してください</label><br>
+        <input type="text" name="stations" placeholder="新宿, 渋谷" style="width: 100%; max-width: 400px; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px;">
+        <br><br>
+        <label>2. どんなお店を探す？</label><br>
+        <select name="genre" style="width: 100%; max-width: 420px; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; background: white;">
+            <option value="G014">ダイニングバー・バル</option>
+            <option value="G001">居酒屋</option>
+            <option value="G004">和食</option>
+            <option value="G005">洋食</option>
+            <option value="G006">イタリアン・フレンチ</option>
+            <option value="G007">中華</option>
+            <option value="G008">焼肉・ホルモン</option>
+            <option value="G013">ラーメン</option>
+            <option value="G011">カラオケ・パーティ</option>
+            <option value="G014">カフェ・スイーツ</option>
+        </select>
+        
+        <br><br>
+        
+        <button type="submit" style="padding: 12px 30px; background: #FF5A5F; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+            このジャンルで中間地点を検索
+        </button>
+    </form>
+</div>
+{% endif %}
+  
+{% if shops %} 
+
+<div style="margin-bottom: 15px;">
+    <a href="/map" style="text-decoration: none; color: #666; font-size: 0.9rem;">← 条件を変えて検索し直す</a>
+</div>
+
+<div id="map" style="height:50vh; width:100%; border-radius: 12px; margin-bottom: 20px;"></div>
+
+<div class="shop-list">
+  {% for s in shops %}
+    <div class="shop-card" style="border:1px solid #eee; padding:15px; margin-bottom:10px; border-radius:12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <b>{{ loop.index }}. {{ s.name }}</b><br>
+            <small>{{ s.genre }} / {{ s.budget }} / 約{{ s.distance_m }}m</small>
+          </div>
+          <a href="{{ url_for('pages.memories_new', shop_name=s.name, title='', shop_url=s.url, lat=s.lat, lng=s.lng) }}" 
+          style="padding: 5px 10px; background: #FF5A5F; color: white; border-radius: 5px; text-decoration: none; font-size: 0.8rem;">
+          🚩 ここに行く！
+          </a>
+      </div>
+      <div style="font-size: 0.9rem; margin-top: 5px; color: #666;">{{ s.access }}</div>
+      <a href="{{ s.url }}" target="_blank" style="font-size: 0.8rem; color: #007bff;">HotPepperで見る</a>
+    </div>
+  {% endfor %}
+</div>
+
+<script>
+  const POINTS = {{ points | tojson }};
+  const MID = {{ mid | tojson }};
+  const SHOPS = {{ shops | tojson }};
+</script>
+
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script async src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap"></script>
+
+{% else %}
+    <p style="text-align: center; color: #999; margin-top: 40px;">駅名を入力して、真ん中の遊び場を見つけましょう！</p>
+{% endif %}
+
+{% endblock %}

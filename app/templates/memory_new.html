@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<div style="max-width: 500px; margin: 0 auto; padding: 20px; font-family: 'Kiwi Maru', serif; color: #5d4037;">
+  <h1 style="text-align: center; color: #4E7055;">🍃 思い出を記す</h1>
+
+  <form method="POST" enctype="multipart/form-data">
+    <div style="margin-bottom: 15px;">
+      <label>思い出のタイトル</label><br>
+      <input name="title" required value="{{ title }}" placeholder="例：最高の休日！" style="width: 100%; padding: 10px; border: 1.5px solid #c8e6c9; border-radius: 8px; background: #fffdf9;">
+    </div>
+
+    <div style="margin-top: 10px;">
+      <label>あの日いつ？</label><br>
+      <input name="date" type="date" value="2026-02-05" style="width: 100%; padding: 10px; border: 1.5px solid #c8e6c9; border-radius: 8px; background: #fffdf9;">
+    </div>
+
+    <div style="margin-top: 10px;">
+      <label>どんなことがあった？</label><br>
+      <textarea name="note" rows="4" placeholder="楽しかった思い出を自由に書きましょう" style="width: 100%; padding: 10px; border: 1.5px solid #c8e6c9; border-radius: 8px; background: #fffdf9;"></textarea>
+    </div>
+
+    <div style="margin-top: 10px;">
+      <label>場所の名前 (店名や地名)</label><br>
+      <input id="shop_name_input" name="shop_name" value="{{ shop_name if shop_name else '' }}" placeholder="渋谷駅、東京タワーなど" style="width: 100%; padding: 10px; border: 1.5px solid #c8e6c9; border-radius: 8px; background: #fffdf9;">
+    </div>
+
+    <input type="hidden" id="lat_input" name="lat" value="{{ lat if lat else '' }}">
+    <input type="hidden" id="lng_input" name="lng" value="{{ lng if lng else '' }}">
+    <input type="hidden" name="shop_url" value="{{ shop_url if shop_url else '' }}">
+
+    <div style="margin-top: 15px;">
+      <label>あの日の一枚</label><br>
+      <input id="imageInput" type="file" name="image" accept="image/*" style="font-size: 0.8rem;">
+      <div style="margin-top: 10px; text-align: center;">
+        <img id="preview" style="max-width: 100%; display: none; border-radius: 15px; border: 3px solid #f1f8e9; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+      </div>
+    </div>
+
+    <button type="button" onclick="handleSave()" id="saveBtn" style="margin-top: 30px; width: 100%; padding: 15px; background-color: #4E7055; color: white; border: none; border-radius: 50px; font-size: 18px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #2e4a34;">
+      思い出を保存する
+    </button>
+  </form>
+</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&libraries=places"></script>
+
+<script>
+function initMap() { console.log("Google Maps Ready!"); }
+
+async function handleSave() {
+    const shopNameInput = document.getElementById('shop_name_input');
+    const latInput = document.getElementById('lat_input');
+    const lngInput = document.getElementById('lng_input');
+    const btn = document.getElementById('saveBtn');
+    const form = document.querySelector('form');
+
+    const locationName = shopNameInput.value.trim();
+
+    if (!locationName) {
+        alert("場所の名前を入力してね！🍃");
+        return;
+    }
+
+    // ボタンを無効化して連打防止
+    btn.disabled = true;
+    btn.innerText = "場所を探しています...";
+
+    // すでに座標がある場合はそのまま送信
+    if (latInput.value && latInput.value !== "" && latInput.value !== "None") {
+        form.submit();
+        return;
+    }
+
+    // 座標がない場合、Googleで検索
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: locationName }, (results, status) => {
+        if (status === "OK") {
+            const loc = results[0].geometry.location;
+            latInput.value = loc.lat();
+            lngInput.value = loc.lng();
+            form.submit();
+        } else {
+            alert("「" + locationName + "」が見つかりませんでした。Google側の設定を確認してください。原因: " + status);
+            btn.disabled = false;
+            btn.innerText = "思い出を保存する";
+        }
+    });
+}
+
+// プレビュー機能
+document.getElementById("imageInput").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    const preview = document.getElementById("preview");
+    if (!file) { preview.style.display = "none"; return; }
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+});
+</script>
+{% endblock %}

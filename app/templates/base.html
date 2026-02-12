@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* アプリ全体の文字を丸みのある手書き風に固定 */
+    body, h1, h2, h3, p, label, input, textarea, button {
+    font-family: 'Kiwi Maru', serif !important;
+    color: #5d4037; /* 真っ黒ではなく、少し温かい茶色に */
+    }
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PlayPlanner</title>
+</head>
+<body style="font-family: system-ui; padding: 0; margin: 0; background-color: #fcfcfc;">
+
+  <nav style="padding: 15px; background: white; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100;">
+      
+      <a href="{{ url_for('pages.index') }}" style="text-decoration: none; font-weight: bold; color: #FF5A5F; font-size: 1.2rem; display: flex; align-items: center; gap: 5px;">
+        🏠 ホーム
+      </a>
+
+      <div>
+          <a href="{{ url_for('pages.memories_list') }}" style="text-decoration: none; color: #666; font-size: 0.9rem;">
+            思い出
+          </a>
+      </div>
+  </nav>
+
+  <div style="padding: 20px;">
+    {% block content %}{% endblock %}
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>思い出一覧</h1>
+
+<p><a href="/memories/new">＋ 新規作成</a></p>
+
+{% for m in items %}
+  <div style="border:1px solid #ddd; padding:12px; border-radius:12px; margin-bottom:10px;">
+    <div><b>{{ m.title }}</b> <small>{{ m.date }}</small></div>
+    
+    {% if m.image_url %}
+      <img src="{{ m.image_url }}" style="max-width:360px; margin-top:8px; border-radius:12px;">
+    {% endif %}
+    
+    <div style="margin-top:6px;">{{ m.note }}</div>
+    
+    {% if m.shop_name %}
+      <div style="margin-top:6px;">
+        店: {{ m.shop_name }}
+        {% if m.shop_url %}<a href="{{ m.shop_url }}" target="_blank">リンク</a>{% endif %}
+      </div>
+    {% endif %}
+
+    <div style="margin-top:10px; border-top:1px solid #eee; pt: 8px;">
+      <form action="{{ url_for('pages.memories_delete', id=m.id) }}" method="POST" style="display: inline;">
+          <button type="submit" style="color: red; cursor: pointer;" onclick="return confirm('本当にこの思い出を削除しますか？')">
+              削除する
+          </button>
+      </form>
+    </div>
+  </div>
+{% endfor %}
+
+{% endblock %}
